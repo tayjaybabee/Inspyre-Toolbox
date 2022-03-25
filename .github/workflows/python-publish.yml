@@ -42,6 +42,8 @@ jobs:
         ruby -v
         gem install github_changelog_generator
         github_changelog_generator -v
+        github_changelog_generator --user tayjaybabee --token ${{ secrets.github_token }} --project Inspyre-Toolbox 
+        -bug-labels Bug::Confirmed, DevTask::Bug --include-tags-regex "ALL"
     - name: Build Poetry Environment
       env:
         PYPI_TOKEN: ${{ secrets.PYPI_API_TOKEN }}
@@ -49,4 +51,3 @@ jobs:
         poetry install
         poetry build
         poetry publish -u __token__ -p "$PYPI_TOKEN"
-

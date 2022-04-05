@@ -14,3 +14,6 @@ requirements.txt
 /.autosrc
 /kite-installer
 /docs
+/pynguin-report/statistics.csv
+/tests/test_inspyre_toolbox.py
+/tests/test_inspyre_toolbox_failing.py

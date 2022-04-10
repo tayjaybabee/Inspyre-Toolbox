@@ -14,8 +14,6 @@ __ver_parser = ConfigParser()
 __ver = get_data('inspyre_toolbox', 'VERSION').decode('UTF8')
 __ver_parser.read_string(__ver)
 
-print(__ver_parser.sections())
-
 
 class Version(object):
 
@@ -27,7 +25,6 @@ class Version(object):
         return res
 
     def __init__(self, version_info):
-        print(dir(version_info))
         self.info = version_info['VERSION']
         self.number = self.info['number']
         self.pre_release = version_info.getboolean('VERSION', 'pre-release')
@@ -40,7 +37,7 @@ class Version(object):
                 prt_tag = 'a'
             elif self.pr_type.lower() == 'beta':
                 prt_tag = 'b'
-            self.pr_tag = str(f"{prt_tag}{self.pr_num}")
+            self.pr_tag = str(f"{self.pr_type}{self.pr_num}")
         else:
             self.pr_info = None
             self.pr_type = None

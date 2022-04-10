@@ -12,7 +12,7 @@ from typing import Any, Callable, Optional, Union, ContextManager
 
 from inflect import engine
 
-from inspyre_toolbox.core_helpers.logging import ROOT_ISL_DEVICE
+from inspyre_toolbox.core.logging import ROOT_ISL_DEVICE
 
 from inspyre_toolbox.humanize.errors import HumanizeErrors
 

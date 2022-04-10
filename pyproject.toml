@@ -13,6 +13,7 @@ DateTime = "^4.3"
 pypattyrn = "^1.2"
 inspy-logger = "^2.1a14"
 inspyred-print = "^1.2.1"
+appdirs = "^1.4.4"
 
 [tool.poetry.dev-dependencies]
 jedi = "^0.18.0"

@@ -6,7 +6,7 @@ from datetime import datetime
 from pypattyrn.behavioral.null import Null
 
 from inspyre_toolbox.proc_man.errors import NoFoundProcessesError
-from inspyre_toolbox.core_helpers.logging import add_isl_child, force_lowkey_log_name
+from inspyre_toolbox.core.logging import add_isl_child, force_lowkey_log_name
 from inspyre_toolbox.humanize import Numerical
 from inspy_logger import InspyLogger
 

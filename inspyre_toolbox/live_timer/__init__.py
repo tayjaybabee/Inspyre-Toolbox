@@ -9,15 +9,16 @@ Description:
     
     To find out more about usage please see:
     
-    GIT_REPO_ROOT/examples/live_timer
-
+    GIT_REPO_ROOT/examples/live_t
 """
 
 from os import makedirs
 from pathlib import Path
 from time import time
 
-from inspyre_toolbox.live_timer.errors import TimerNotStartedError
+from inspyre_toolbox.core.debugging import who_rang
+
+from inspyre_toolbox.live_timer.errors import ParadoxicalStartRequestError, TimerNotStartedError, TimerNotRunningError
 
 
 class TimerHistory(object):
@@ -81,12 +82,16 @@ def format_seconds_to_hhmmss(seconds):
 class Timer(object):
     
     def __repr__(self):
-        statement = "Timer("\
+        statement = "Timer(" \
                     f"Started: {self.started} |"
         if self.started:
             runtime = time() - self.start_time
             runtime = format_seconds_to_hhmmss(runtime)
             statement += f" Started: {self.start_time} - Current Runtime: {runtime}"
+
+        statement += " )"
+
+        return statement
 
     def __init__(self):
         
@@ -101,6 +106,8 @@ class Timer(object):
         self.paused = False
         self.was_paused = False
         self.mark_2 = None
+        self.stopped = False
+        self.stopped_at = None
 
         # Start a Timer history object to track times for resets
         self.history = TimerHistory(self.__get_elapsed)
@@ -141,10 +148,14 @@ class Timer(object):
             self.history.add("QUERY")
             return self.__get_elapsed(*args, **kwargs)
         else:
-            try:
-                raise TimerNotStartedError(skip_print=True)
-            except TimerNotStartedError as e:
-                print(e.message)
+            if not self.started:
+                try:
+                    raise TimerNotStartedError(skip_print=True)
+                except TimerNotStartedError as e:
+                    print(e.message)
+
+            elif self.stopped:
+                return self.get_elapsed(ts=self.stopped_at)
 
     def reset(self):
         """
@@ -160,18 +171,46 @@ class Timer(object):
         self.pause_end = None
         self.started = False
         self.mark_2 = None
+        self.start_time = None
+        self.is_running = False
         
     def restart(self):
+        """
+
+        Restart the timer.
+
+        Calls self.reset() and then starts the timer using the self.start() function.
+
+        Returns:
+            None
+
+        """
         self.reset()
         if not self.started:
             self.start()
 
-    def start(self):
+    def start(self, reset_if_stopped=True):
         """
 
         Store the time the thread was started and assign the attribute 'self.started' to 'True' to indicate this.
 
+        Arguments:
+            reset_if_stopped (Optional, bool): If self.stopped is bool(True) should this function just go ahead and
+                                               call self.restart which will in-turn call self.reset before adjusting
+                                               for its own time tracking and query history. (Optional, defaults to
+                                               True)
+
+        Note:
+             If the argument "reset_if_stopped" is explicitly set to bool(False) while also making that call on a timer
+             object that has been stopped (timer.stopped is True) the function will raise
+
         """
+        if self.stopped:
+            if not reset_if_stopped:
+                raise ParadoxicalStartRequestError(caller=who_rang())
+            else:
+                self.reset()
+
         self.start_time = time()
         self.started = True
         self.history.add()
@@ -220,3 +259,28 @@ class Timer(object):
             self.history.add("UNPAUSE")
         else:
             return False
+
+    def stop(self):
+        """
+
+        Stop a currently running timer.
+
+        This function sets the following attributes for its parent class, effectively stopping timer progress:
+
+            * 'self.stopped_at' gets set to time.time() at the time of execution; and
+            * 'self.is_running' is set to False.....kinda obviously; and
+            * 'self.paused' is returned to a False state
+
+        Returns:
+            None
+
+        """
+        if self.is_running:
+            self.stopped_at = time()
+            self.is_running = False
+            self.history.add('STOP')
+            self.paused = False
+            self.stopped = True
+        else:
+            raise TimerNotRunningError()
+

@@ -12,7 +12,7 @@ from typing import Callable, ContextManager, Optional, Union
 
 from inflect import engine
 
-from inspyre_toolbox.core_helpers.logging import ROOT_ISL_DEVICE
+from inspyre_toolbox.core_helpers.logging import ROOT_ISL_DEVICE, add_isl_child
 from inspyre_toolbox.humanize.errors import HumanizeErrors
 
 # Instantiate inflect.engine as 'INF'
@@ -119,7 +119,7 @@ class Numerical(object):
 
         self.log_name = 'Inspyre-Toolbox.humanize.Numerical'
 
-        self.cls_logger = ROOT_ISL_DEVICE.add_child(self.log_name)
+        self.cls_logger = add_isl_child(self.log_name)
         self.cls_logger.debug(f"Started logger: {self.log_name}")
 
     def count_noun(

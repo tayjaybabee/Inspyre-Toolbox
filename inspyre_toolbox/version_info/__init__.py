@@ -1,3 +1,6 @@
+"""
+Contains the version class and other related information.
+"""
 from configparser import ConfigParser
 from pkgutil import get_data
 
@@ -7,7 +10,6 @@ from inspyre_toolbox.core.errors.version import \
     VersionInfoMismatchError, \
     InvalidPreReleaseTypeError
 from inspyre_toolbox.pypi.packages import up_to_date
-
 
 _color = Color()
 _format = Format()
@@ -20,29 +22,48 @@ __ver_parser.read_string(__ver)
 
 # Since v1.3.1:
 PRE_RELEASE_TYPES = {
-                    'dev': {
-                            'tag': 'dev',
-                            'full': 'Development',
-                            'order': 0
-                    },
-                    'alpha': {
-                            'tag': 'a',
-                            'full': 'Alpha',
-                            'order': 1
-                    },
-                    'beta': {
-                            'tag': 'b',
-                            'full': 'Beta',
-                            'order': 2
-                    },
-                    'rc': {
-                            'tag': 'rc',
-                            'full': 'Release Candidate',
-                            'order': 3
-                    }
-            }
+        'dev':   {
+                'tag':   'dev',
+                'full':  'Development',
+                'order': 0
+        },
+        'alpha': {
+                'tag':   'a',
+                'full':  'Alpha',
+                'order': 1
+        },
+        'beta':  {
+                'tag':   'b',
+                'full':  'Beta',
+                'order': 2
+        },
+        'rc':    {
+                'tag':   'rc',
+                'full':  'Release Candidate',
+                'order': 3
+        }
+}
+
+
+def prepare_dev_version(log_obj):
+    """
+    Prepare a development version for use.
+
+    Args:
+        log_obj(:obj:`inspyre_toolbox.core_helpers.logging.ROOT_ISL_DEVICE`):
+            The log device to use.
+    """
+    log_obj.info(f"{_red}Inspyre Toolbox {__ver_parser['version']} {_end}")
+    log_obj.warning(f"{_red}This is a development version. ")
+    log_obj.warning("It is not recommended to use this version.")
+    log_obj.adjust_level('debug')
+
 
 class Version(object):
+    """
+    The Version class is used to store the version information of the
+    inspyre_toolbox package.
+    """
 
     def _check_most_current(self):
         """
@@ -64,6 +85,34 @@ class Version(object):
         return res
 
     def __init__(self, version_info):
+        """
+        The __init__ function initializes the class.
+
+        Args:
+            version_info (:obj:`dict`):
+                A dictionary containing the version information with the following keys:
+
+                    * major:
+                        The major version number.
+
+                    * minor:
+                        The minor version number.
+
+                    * patch:
+                        The patch version number.
+
+                    * pre_release:
+                        A boolean value indicating whether the version is a pre-release.
+
+                    * pr_type:
+                        The pre-release type (e.g. 'dev', 'alpha', 'beta', 'rc').
+
+                    * pr_num:
+                        The pre-release build number.
+
+                    * full:
+                        The full version string (e.g. '1.2.3-alpha.1.2.3').
+        """
         self.info = version_info['VERSION']
         self.number = self.info['number']
 
@@ -77,9 +126,9 @@ class Version(object):
 
         if self.concatenated != self.number:
             raise VersionInfoMismatchError(
-                f"The version number in the VERSION file ({self.concatenated}) "
-                f"does not match the full version number in the VERSION file "
-                f"({self.number})")
+                    f"The version number in the VERSION file ({self.concatenated}) "
+                    f"does not match the full version number in the VERSION file "
+                    f"({self.number})")
 
         self.pre_release = version_info.getboolean('VERSION', 'pre-release')
 
@@ -114,6 +163,9 @@ class Version(object):
     def __repr__(self) -> str:
         """
         The __repr__ function returns a string representation of the class.
+
+        Returns:
+            A string representation of the class.
         """
         _repr = f"Major: {self.major}\nMinor: {self.minor}\nPatch: {self.patch}"
 
@@ -125,6 +177,9 @@ class Version(object):
     def __str__(self) -> str:
         """
         The __str__ function returns a string representation of the class.
+
+        Returns:
+            A string representation of the class.
         """
         return self.full
 
